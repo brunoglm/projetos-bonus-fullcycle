@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 type Partner1 struct {
@@ -45,7 +46,10 @@ func (p *Partner1) MakeReservation(req *ReservationRequest) ([]ReservationRespon
 	}
 	httpReq.Header.Set("Content-Type", "application/json")
 
-	httpResp, err := http.DefaultClient.Do(httpReq)
+	httpClient := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+	httpResp, err := httpClient.Do(httpReq)
 	if err != nil {
 		return nil, err
 	}
