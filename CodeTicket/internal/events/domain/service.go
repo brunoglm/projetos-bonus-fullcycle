@@ -9,23 +9,40 @@ var (
 	ErrSpotServiceQuantityZero = errors.New("quantity must be greater than zero")
 )
 
-type spotService struct{}
+type SpotService struct{}
 
 // NewSpotService creates a new SpotService.
-func NewSpotService() *spotService {
-	return &spotService{}
+func NewSpotService() *SpotService {
+	return &SpotService{}
 }
 
 // GenerateSpots generates the specified number of spots for an event.
-func (s *spotService) GenerateSpots(event *Event, quantity int) error {
+func (s *SpotService) GenerateEventSpots(event *Event, quantity int) error {
 	if quantity <= 0 {
 		return ErrSpotServiceQuantityZero
 	}
 
 	for i := 0; i < quantity; i++ {
-		spotName := fmt.Sprintf("%c%d", 'A'+i/10, i%10+1) // Generate spot name like A1, A2, ..., B1, B2, ...
+		spotName := generateSpotName(i)
 		event.AddSpot(spotName)
 	}
 
 	return nil
+}
+
+func (s *SpotService) GenerateSpots(event *Event, index int) (*Spot, error) {
+	spotName := generateSpotName(index)
+	spot, err := NewSpot(event, spotName)
+	if err != nil {
+		return nil, err
+	}
+
+	return spot, nil
+}
+
+func generateSpotName(index int) string {
+	// Gera um nome de spot baseado no índice. Ex: A1, A2, ..., B1, B2, etc.
+	letter := 'A' + rune(index/10)
+	number := index%10 + 1
+	return fmt.Sprintf("%c%d", letter, number)
 }
